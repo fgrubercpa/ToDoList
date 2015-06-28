@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace ToDoList
 {
@@ -17,13 +19,47 @@ namespace ToDoList
             {
           
             };
-            using (TodoListContext context = new TodoListContext())
+
+            using (SqlConnection connection = new SqlConnection("Server=MSI;Database=ToDoList;Trusted_Connection=True;"))
+                
+
             {
-                foreach (ToDoListItem item in context.ToDoListTable)
+                connection.Open();
+                using (SqlCommand command = connection.CreateCommand())
                 {
-                    Items.Add(item);
+                    string query = "select * from dbo.ToDoListItem";
+                    command.CommandText = query;
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string description = reader.GetString(1);
+                            ToDoListItem item = new ToDoListItem();
+                            item.Description = description;
+                            Items.Add(item);
+                        }
+                    
+                    
+                    
+                    }
+
                 }
+
             }
+            
+            
+
+
+
+
+
+            //using (TodoListContext context = new TodoListContext())
+            //{
+            //    foreach (ToDoListItem item in context.ToDoListTable)
+            //    {
+            //        Items.Add(item);
+            //    }
+            //}
 
         }
 
@@ -33,16 +69,50 @@ namespace ToDoList
                    
             itemToAdd.Description = description;
             Items.Add(itemToAdd);
-            using (TodoListContext context=new TodoListContext())
+            //using (TodoListContext context=new TodoListContext())
+            //{
+            //    context.ToDoListTable.Add(itemToAdd);
+            //    context.SaveChanges();
+
+            //}
+          
+            
+            
+            using (SqlConnection connection = new SqlConnection("Server=MSI;Database=ToDoList;Trusted_Connection=True;"))
             {
-                context.ToDoListTable.Add(itemToAdd);
-                context.SaveChanges();
+                connection.Open();
+                using (SqlCommand command = connection.CreateCommand())
+                {
+                    string insertStatement = "insert dbo.ToDoListItem(description) values(@desc2)";
+                    //string insertStatement = "insert dbo.ToDoListItem(description) values('" + description + "')";
+                    
+                    command.CommandText = insertStatement;
+                    command.Parameters.Add("@desc2", SqlDbType.NVarChar);
+                    command.Parameters["@desc2"].Value = description;
+                    command.ExecuteNonQuery();
+
+                }
 
             }
+            
+            
+            
+            
+            
+            
             return itemToAdd;
+
+
+
+
 
         }
 
+   
+    
+    
+    
+    
     }
     
 }
