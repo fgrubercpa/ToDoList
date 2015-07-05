@@ -32,6 +32,12 @@ namespace ToDoList
         {
             _viewModel.AddItem(NewItemDescription.Text);
         }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (ToDoListItem)ListOfToDoItems.SelectedItem;
+            _viewModel.DeleteItem(item);
+        }
     }
     
 }

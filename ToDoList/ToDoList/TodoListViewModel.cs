@@ -12,6 +12,8 @@ namespace ToDoList
     class TodoListViewModel
     {
         public ObservableCollection<ToDoListItem> Items { get; set; }
+       
+        
         public TodoListViewModel()
         {
 
@@ -20,6 +22,12 @@ namespace ToDoList
           
             };
 
+    
+     
+ // Add Current Items in Database to 'To Do Items List' named 'ToDoListItem'. 
+ 
+            
+            
             using (SqlConnection connection = new SqlConnection("Server=MSI;Database=ToDoList;Trusted_Connection=True;"))
                 
 
@@ -63,11 +71,20 @@ namespace ToDoList
 
         }
 
+
+
+// Add New 'To Do Item' to 'To Do Item List' named 'ToDoListItem'.     
+
+        
+
+
         public ToDoListItem AddItem (string description)
         {
             ToDoListItem itemToAdd = new ToDoListItem();
                    
             itemToAdd.Description = description;
+         
+       
             Items.Add(itemToAdd);
             //using (TodoListContext context=new TodoListContext())
             //{
@@ -96,23 +113,16 @@ namespace ToDoList
             }
             
             
-            
-            
-            
-            
             return itemToAdd;
-
-
-
-
 
         }
 
-   
-    
-    
-    
-    
+        public void DeleteItem(ToDoListItem itemToDelete)
+        {
+            Items.Remove(itemToDelete);
+        }
+
+
     }
     
 }
