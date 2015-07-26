@@ -9,6 +9,8 @@ using System.Data.SqlClient;
 
 namespace ToDoList
 {
+    using System.Configuration;
+
     class TodoListViewModel
     {
         public ObservableCollection<ToDoListItem> Items { get; set; }
@@ -21,16 +23,9 @@ namespace ToDoList
             {
           
             };
-
-    
-     
- // Add Current Items in Database to 'To Do Items List' named 'ToDoListItem'. 
- 
-            
-            
-            using (SqlConnection connection = new SqlConnection("Server=MSI;Database=ToDoList;Trusted_Connection=True;"))
-                
-
+             // Add Current Items in Database to 'To Do Items List' named 'ToDoListItem'. 
+            var connectionString = ConfigurationManager.ConnectionStrings["TodoList"];
+            using (SqlConnection connection = new SqlConnection(connectionString.ConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = connection.CreateCommand())
@@ -46,28 +41,9 @@ namespace ToDoList
                             item.Description = description;
                             Items.Add(item);
                         }
-                    
-                    
-                    
                     }
-
                 }
-
             }
-            
-            
-
-
-
-
-
-            //using (TodoListContext context = new TodoListContext())
-            //{
-            //    foreach (ToDoListItem item in context.ToDoListTable)
-            //    {
-            //        Items.Add(item);
-            //    }
-            //}
 
         }
 
@@ -86,28 +62,20 @@ namespace ToDoList
          
        
             Items.Add(itemToAdd);
-            //using (TodoListContext context=new TodoListContext())
-            //{
-            //    context.ToDoListTable.Add(itemToAdd);
-            //    context.SaveChanges();
 
-            //}
-          
-            
-            
-            using (SqlConnection connection = new SqlConnection("Server=MSI;Database=ToDoList;Trusted_Connection=True;"))
+            var connectionString = ConfigurationManager.ConnectionStrings["TodoList"];
+            using (SqlConnection connection = new SqlConnection(connectionString.ConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = connection.CreateCommand())
                 {
-                    string insertStatement = "insert dbo.ToDoListItem(description) values(@desc2)";
-                    //string insertStatement = "insert dbo.ToDoListItem(description) values('" + description + "')";
+                    string insertStatement = "insert dbo.ToDoListItem(description) values(@desc2); select scope_identity()";
                     
                     command.CommandText = insertStatement;
                     command.Parameters.Add("@desc2", SqlDbType.NVarChar);
                     command.Parameters["@desc2"].Value = description;
-                    command.ExecuteNonQuery();
-
+                    var result = command.ExecuteScalar();
+                    itemToAdd.Id = Convert.ToInt32((decimal) result);
                 }
 
             }
